@@ -24,8 +24,11 @@ TEST_CASE("Player stacksize method") {
     CHECK(start);
     //check the amont of cards after one turn
     game.playTurn();
-    bool oneTurn = (p1.stacksize()%2 == 1) && (p1.stacksize() == p2.stacksize());
+    bool oneTurnNotEnd = (p1.stacksize()%2 == 1) && (p1.stacksize() == p2.stacksize());
+    bool oneTurnEnd = (p1.stacksize() == 0) && (p2.stacksize() == 0);
+    bool oneTurn = oneTurnEnd || oneTurnNotEnd;
     CHECK(oneTurn);
+    
     //check that after five turns the amount of cards is maximum 20
     for (int i=0;i<5;i++) {
         game.playTurn();
@@ -45,12 +48,13 @@ TEST_CASE("Player cardesTaken method") {
     game.playTurn();
     bool player1Win = (p1.cardesTaken() == (26-p1.stacksize())*2) && (p2.cardesTaken() == 0);
     bool player2Win = (p2.cardesTaken() == (26-p2.stacksize())*2) && (p1.cardesTaken() == 0);
-    bool oneTurn = player1Win || player2Win;
+    bool tie = (p1.cardesTaken() == 26) && (p2.cardesTaken() == 26);
+    bool oneTurn = player1Win || player2Win || tie;
     CHECK(oneTurn);
     //make another check the amont of cards after one turn
     player1Win = (p1.cardesTaken() >= 2) && (p2.cardesTaken() == 0);
     player2Win = (p2.cardesTaken()>= 2) && (p1.cardesTaken() == 0);
-    oneTurn = player1Win || player2Win;
+    oneTurn = player1Win || player2Win || tie;
     CHECK(oneTurn);
     //check the amount of taken cards after six turns 
     for (int i=0;i<5;i++) {
@@ -103,6 +107,7 @@ TEST_CASE("Game playAll method") {
     Player  p1("player1");
     Player  p2("player2");
     Game game(p1,p2);
+    game.playAll();
     //check that after the function the amount of cards in the stack is 0
     bool stacksize = (p1.stacksize() == 0) && (p2.stacksize() == 0);
     CHECK(stacksize);
@@ -110,7 +115,6 @@ TEST_CASE("Game playAll method") {
     bool cardesTaken = (p1.cardesTaken() + p2.cardesTaken() == 52);
     CHECK(cardesTaken);
     //check that after the game is over we can't play
-    game.playAll();
     CHECK_THROWS(game.playAll());
     
 }
